@@ -4,43 +4,45 @@ import runner from './index';
 
 describe('runner', function() {
   it('Pass promise function to runner', async () => {
-    function exec(data: any): Promise<any> {
-      return Promise.resolve(1);
+    const reference = new Date().valueOf();
+    function exec(data: any = reference): Promise<any> {
+      return Promise.resolve(data);
     }
+
     const result: any[] = await runner([exec]);
-    expect(result[0]).to.equal(1);
+    expect(result[0]).to.equal(reference);
   });
 
-  // it('Pass async function to runner', async () => {
-  //   async function exec(): Promise<any> {
-  //     function sleep(time: number) {
-  //       return new Promise((resolve) => {
-  //         setTimeout(resolve, time);
-  //       });
-  //     }
+  it('Pass async function to runner', async () => {
+    const reference = new Date().valueOf();
+    async function exec(data: any = reference): Promise<any> {
+      function sleep(time: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
 
-  //     await sleep(50);
-  //     return Promise.resolve(1);
-  //   }
+      await sleep(12);
+      return Promise.resolve(data);
+    }
 
-  //   const result = await runner([exec]);
-  //   expect(result).to.equal(1);
-  // });
+    const result: any[] = await runner([exec]);
+    expect(result[0]).to.equal(reference);
+  });
 
-  // it('Pass array of async function to runner', async () => {
-  //   async function exec(): Promise<any> {
-  //     function sleep(time: number) {
-  //       return new Promise((resolve) => {
-  //         setTimeout(resolve, time);
-  //       });
-  //     }
+  it('Pass array of async function to runner', async () => {
+    const reference = new Date().valueOf();
+    async function exec(data: any = reference): Promise<any> {
+      function sleep(time: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
 
-  //     await sleep(50);
-  //     return Promise.resolve(1);
-  //   }
+      await sleep(12);
+      return Promise.resolve(data);
+    }
 
-  //   const result = await runner([exec]);
-  //   expect(result[0]).to.equal(1);
-  //   expect(result[1]).to.equal(1);
-  // });
+    const result: any[] = await runner([exec, exec, exec]);
+    expect(result.length).to.equal(3);
+    expect(result[0]).to.equal(reference);
+    expect(result[1]).to.equal(reference);
+    expect(result[2]).to.equal(reference);
+  });
 });
